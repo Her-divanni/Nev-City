@@ -3,324 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tena Iz - Super Social</title>
+    <title>Nv'City - Version Ultime</title>
     <style>
-        :root {
-            --pink-main: #ff69b4;
-            --pink-light: #fff0f6;
-            --shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--pink-light); margin: 0; padding-bottom: 50px; }
+        :root { --accent: #ff69b4; --bg: #f0f2f5; --gold: #ffd700; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* HEADER */
-        header { 
-            background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        header span { color: var(--pink-main); font-weight: 800; font-size: 1.3rem; }
+        /* Header & Barre XP */
+        header { background: white; padding: 10px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 100; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; }
+        .xp-bar { height: 6px; background: #eee; width: 100%; margin-top: 8px; border-radius: 3px; overflow: hidden; }
+        .xp-progress { height: 100%; background: var(--accent); width: 0%; transition: 0.8s; }
 
-        .container { max-width: 500px; margin: auto; padding: 10px; }
+        /* Onglets */
+        .tabs { display: flex; background: white; border-bottom: 1px solid #ddd; flex-shrink: 0; }
+        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; font-weight: bold; color: gray; font-size: 0.85rem; }
+        .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
 
-        /* NOTIFICATIONS */
-        #notification-container { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 80%; max-width: 300px; pointer-events: none; }
-        .notification { 
-            background: white; padding: 12px 20px; border-radius: 12px; box-shadow: var(--shadow);
-            border-left: 5px solid var(--pink-main); margin-bottom: 10px; font-size: 14px; font-weight: 600;
-            display: flex; align-items: center; gap: 10px; animation: slideDown 0.4s ease forwards;
-        }
+        .content { flex: 1; overflow-y: auto; padding: 15px; }
+        .hidden { display: none; }
 
-        /* NAVIGATION TABS */
-        .tabs { display: flex; background: white; margin: 15px 0; border-radius: 15px; padding: 5px; box-shadow: var(--shadow); position: sticky; top: 70px; z-index: 900; }
-        .tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; border-radius: 12px; font-weight: 600; color: #888; font-size: 13px; position: relative; transition: 0.3s; }
-        .tab.active { background: var(--pink-main); color: white; }
-        .badge { position: absolute; top: 8px; right: 15%; width: 10px; height: 10px; background: #ff4444; border-radius: 50%; border: 2px solid white; display: none; }
-
-        /* CARDS & POSTS */
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 20px; position: relative; }
-        .post { background: white; border-radius: 20px; padding: 18px; margin-bottom: 15px; box-shadow: var(--shadow); position: relative; }
-        .post-header { display: flex; align-items: center; margin-bottom: 12px; }
-        .mini-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 12px; background: #f0f0f0; border: 1px solid #eee; }
-        .post-img { width: 100%; border-radius: 15px; margin-top: 12px; display: block; }
+        /* Design des Cartes (Posts & Classement) */
+        .card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .post b { color: #333; font-size: 0.9rem; }
+        .post p { margin: 8px 0; color: #555; }
         
-        .delete-btn { 
-            position: absolute; top: 15px; right: 15px; background: #fff0f6; color: var(--pink-main); 
-            border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; 
-            font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s;
-        }
-        .delete-btn:hover { background: var(--pink-main); color: white; }
+        .reac-btn { background: #fff0f6; border: none; border-radius: 20px; padding: 6px 15px; cursor: pointer; color: var(--accent); font-weight: bold; font-size: 0.8rem; }
+        
+        /* Classement */
+        .rank-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid #eee; }
+        .rank-pos { font-weight: bold; width: 25px; color: #888; }
+        .rank-1 { color: var(--gold); font-size: 1.2rem; }
 
-        /* MESSAGERIE */
-        .chat-window { height: 300px; overflow-y: auto; background: #fdfdfd; border-radius: 15px; padding: 15px; display: flex; flex-direction: column; margin-bottom: 15px; border: 1px solid #f0f0f0; }
-        .msg { padding: 10px 15px; border-radius: 18px; margin-bottom: 8px; max-width: 85%; font-size: 14px; line-height: 1.4; }
-        .msg.sent { background: var(--pink-main); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .msg.received { background: #f0f0f0; color: #333; align-self: flex-start; border-bottom-left-radius: 4px; }
+        /* Chat */
+        .chat-zone { display: flex; flex-direction: column; height: 100%; }
+        #chatContent { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 10px; }
+        .msg { background: white; padding: 8px 12px; border-radius: 12px; width: fit-content; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .my-msg { align-self: flex-end; background: var(--accent); color: white; }
 
-        /* INPUTS & BUTTONS */
-        .hidden { display: none !important; }
-        input, textarea, select { width: 100%; border: 1px solid #eee; background: #fbfbfb; border-radius: 12px; padding: 12px; box-sizing: border-box; outline: none; margin-bottom: 10px; font-family: inherit; }
-        input:focus { border-color: var(--pink-main); }
-        .btn-main { background: var(--pink-main); color: white; border: none; padding: 14px; border-radius: 15px; font-weight: bold; width: 100%; cursor: pointer; transition: 0.3s; }
-        .btn-main:active { transform: scale(0.98); }
-
-        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        /* Inputs */
+        .input-box { display: flex; gap: 10px; background: white; padding: 10px; border-radius: 25px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        input { flex: 1; border: none; outline: none; background: transparent; }
     </style>
 </head>
 <body>
 
-<div id="notification-container"></div>
-
 <header>
-    <span>🌸 Nv'City</span>
-    <button onclick="logout()" style="border:none; background:none; color:#999; font-weight:600; cursor:pointer;">Quitter</button>
+    <div class="top-bar">
+        <h1>🏙️ Nv'City</h1>
+        <div onclick="changerPseudo()" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <div style="text-align: right;">
+                <span id="displayPseudo" style="font-weight:bold; font-size:0.85rem;">...</span><br>
+                <small id="displayXP" style="color:var(--accent); font-weight:bold;">0 XP</small>
+            </div>
+            <img id="myAvatar" src="" style="width:35px; height:35px; border-radius:50%; border:2px solid var(--accent);">
+        </div>
+    </div>
+    <div class="xp-bar"><div id="xpProg" class="xp-progress"></div></div>
 </header>
 
-<div class="container">
-    <div class="tabs">
-        <div id="tFeed" class="tab active" onclick="switchTab('feed')">Fil</div>
-        <div id="tGal" class="tab" onclick="switchTab('gal')">Galerie</div>
-        <div id="tMsg" class="tab" onclick="switchTab('msg')">Messages <span id="notifBadge" class="badge"></span></div>
-        <div id="tProf" class="tab" onclick="switchTab('prof')">Profil</div>
-    </div>
+<div class="tabs">
+    <div id="tabFeed" class="tab active" onclick="switchTab('feed')">FIL</div>
+    <div id="tabRank" class="tab" onclick="switchTab('rank')">TOP 10</div>
+    <div id="tabChat" class="tab" onclick="switchTab('chat')">CHAT</div>
+</div>
 
-    <div id="secFeed">
-        <div class="card">
-            <textarea id="pTxt" placeholder="Quoi de neuf, ${localStorage.getItem('currentUser')} ?" rows="3"></textarea>
-            <input type="file" id="pImg" accept="image/*">
-            <button class="btn-main" onclick="publier()">Partager</button>
-        </div>
-        <div id="feedContent"></div>
+<div id="secFeed" class="content">
+    <div class="input-box">
+        <input type="text" id="pTxt" placeholder="Quoi de neuf dans la city ?">
+        <button onclick="publier()" style="background:var(--accent); color:white; border:none; padding:8px 15px; border-radius:20px; font-weight:bold; cursor:pointer;">POST</button>
     </div>
+    <div id="feedContent"></div>
+</div>
 
-    <div id="secGal" class="hidden">
-        <div id="galContent" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;"></div>
+<div id="secRank" class="content hidden">
+    <div class="card">
+        <h3 style="margin-top:0; text-align:center;">🏆 Meilleurs Citoyens</h3>
+        <div id="rankList"></div>
     </div>
+</div>
 
-    <div id="secMsg" class="hidden">
-        <div class="card">
-            <h3 style="margin-top:0; color:var(--pink-main);">Nouveau message privé</h3>
-            <select id="destinataire"></select>
-            <textarea id="mTxt" placeholder="Ecrivez ici..." rows="2"></textarea>
-            <button class="btn-main" onclick="envoyerMP()">Envoyer</button>
-        </div>
-        <div class="card">
-            <h3>Discussions</h3>
-            <div id="chatBox" class="chat-window"></div>
-        </div>
-    </div>
-
-    <div id="secProf" class="hidden">
-        <div class="card" style="text-align:center;">
-            <img id="myAvatar" src="" class="mini-avatar" style="width:100px; height:100px; margin-bottom:10px;">
-            <h2 id="myName" style="margin:5px 0;">Pseudo</h2>
-            <button onclick="retirerPhoto()" style="color:#ff4444; background:none; border:none; cursor:pointer; font-size:12px;">Retirer la photo de profil</button>
-        </div>
-        <div class="card">
-            <label style="font-size:12px; color:gray;">Changer mon pseudo :</label>
-            <input type="text" id="newName" placeholder="Nouveau pseudo">
-            <label style="font-size:12px; color:gray;">Changer ma photo :</label>
-            <input type="file" id="newPic" accept="image/*">
-            <button class="btn-main" onclick="sauvegarderProfil()">Mettre à jour le profil</button>
+<div id="secChat" class="content hidden" style="background: #e5ddd5;">
+    <div class="chat-zone">
+        <div id="chatContent"></div>
+        <div class="input-box">
+            <input type="text" id="cTxt" placeholder="Message direct...">
+            <button onclick="envoyerChat()" style="background:var(--accent); color:white; border:none; border-radius:50%; width:35px; height:35px; cursor:pointer;">🚀</button>
         </div>
     </div>
 </div>
 
-<script>
-    let user = localStorage.getItem("currentUser");
-    if (!user) window.location.href = "index.html";
+<script type="module">
+    // INITIALISATION FIREBASE (Ligne 58 environ)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, updateDoc, increment, setDoc, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // --- UTILITAIRES ---
-    function notifier(msg, icon = "🌸") {
-        const container = document.getElementById('notification-container');
-        const n = document.createElement('div');
-        n.className = 'notification';
-        n.innerHTML = `<span>${icon}</span> ${msg}`;
-        container.appendChild(n);
-        setTimeout(() => { n.style.opacity = '0'; setTimeout(() => n.remove(), 500); }, 3000);
+    const firebaseConfig = {
+        apiKey: "AIzaSyDXEUHxufBZyRcoa6bExcN-QFqcb5zyBm4",
+        authDomain: "nv-city-2f51d.firebaseapp.com",
+        projectId: "nv-city-2f51d",
+        storageBucket: "nv-city-2f51d.firebasestorage.app",
+        messagingSenderId: "313757648006",
+        appId: "1:313757648006:web:c8f83006358be09f267d07",
+        measurementId: "G-F78EWDN1M6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // GESTION UTILISATEUR
+    let currentUser = localStorage.getItem("pseudo") || "Citoyen" + Math.floor(Math.random()*999);
+    
+    window.updateUI = () => {
+        document.getElementById('displayPseudo').innerText = "@" + currentUser;
+        document.getElementById('myAvatar').src = `https://ui-avatars.com/api/?name=${currentUser}&background=ff69b4&color=fff`;
+    };
+    updateUI();
+
+    window.changerPseudo = () => {
+        const p = prompt("Choisis ton pseudo Nv'City :", currentUser);
+        if(p && p.trim()) { localStorage.setItem("pseudo", p.trim()); location.reload(); }
+    };
+
+    // SYSTÈME XP
+    async function addXP(pts) {
+        await updateDoc(doc(db, "citoyens", currentUser), { xp: increment(pts) });
     }
 
-    // --- NAVIGATION ---
-    function switchTab(mode) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('secFeed').classList.add('hidden');
-        document.getElementById('secGal').classList.add('hidden');
-        document.getElementById('secMsg').classList.add('hidden');
-        document.getElementById('secProf').classList.add('hidden');
-
-        const tabKey = "t" + mode.charAt(0).toUpperCase() + mode.slice(1);
-        const secKey = "sec" + mode.charAt(0).toUpperCase() + mode.slice(1);
-        
-        document.getElementById(tabKey).classList.add('active');
-        document.getElementById(secKey).classList.remove('hidden');
-
-        if(mode === 'feed') afficherFeed();
-        if(mode === 'gal') afficherGalerie();
-        if(mode === 'msg') { document.getElementById('notifBadge').style.display = 'none'; chargerMessagerie(); }
-        if(mode === 'prof') chargerProfil();
-    }
-
-    // --- LOGIQUE PUBLICATIONS ---
-    function publier() {
+    // ACTIONS
+    window.publier = async () => {
         const t = document.getElementById('pTxt').value;
-        const i = document.getElementById('pImg').files[0];
-        if(!t && !i) return;
-
-        if(i) {
-            let r = new FileReader();
-            r.readAsDataURL(i);
-            r.onload = () => savePost(t, r.result);
-        } else {
-            savePost(t, null);
-        }
-    }
-
-    function savePost(t, img) {
-        let p = JSON.parse(localStorage.getItem("mes_posts")) || [];
-        p.unshift({ id: Date.now(), auteur: user, texte: t, image: img, date: new Date().toLocaleString('fr-FR', {hour:'2-digit', minute:'2-digit', day:'numeric', month:'short'}) });
-        localStorage.setItem("mes_posts", JSON.stringify(p));
+        if(!t.trim()) return;
+        await addDoc(collection(db, "posts"), { auteur: currentUser, contenu: t, date: serverTimestamp(), likes: 0 });
+        await addXP(10);
         document.getElementById('pTxt').value = "";
-        document.getElementById('pImg').value = "";
-        notifier("Publication réussie !");
-        afficherFeed();
-    }
+    };
 
-    function supprimerPost(idASupprimer) {
-        if(confirm("Supprimer cette publication ?")) {
-            let posts = JSON.parse(localStorage.getItem("mes_posts")) || [];
-            // Filtrage par ID (nouveaux) ou par Index (anciens)
-            let nouveaux = posts.filter((p, index) => (p.id ? p.id !== idASupprimer : index !== idASupprimer));
-            localStorage.setItem("mes_posts", JSON.stringify(nouveaux));
-            notifier("Publication supprimée", "🗑️");
-            afficherFeed();
-        }
-    }
+    window.aimer = async (id, auteurPost) => {
+        await updateDoc(doc(db, "posts", id), { likes: increment(1) });
+        if(auteurPost !== currentUser) await addXP(2); // XP pour celui qui like
+    };
 
-    function afficherFeed() {
-        let p = JSON.parse(localStorage.getItem("mes_posts")) || [];
-        let db = JSON.parse(localStorage.getItem("db_social")) || [];
+    window.envoyerChat = async () => {
+        const t = document.getElementById('cTxt').value;
+        if(!t.trim()) return;
+        await addDoc(collection(db, "messages"), { auteur: currentUser, texte: t, date: serverTimestamp() });
+        document.getElementById('cTxt').value = "";
+    };
+
+    // NAVIGATION
+    window.switchTab = (t) => {
+        document.getElementById('secFeed').classList.toggle('hidden', t !== 'feed');
+        document.getElementById('secRank').classList.toggle('hidden', t !== 'rank');
+        document.getElementById('secChat').classList.toggle('hidden', t !== 'chat');
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('active');
+    };
+
+    // TEMPS RÉEL
+    // 1. Profil & XP
+    onSnapshot(doc(db, "citoyens", currentUser), (d) => {
+        if(!d.exists()) { setDoc(doc(db, "citoyens", currentUser), { xp: 0 }); return; }
+        const xp = d.data().xp || 0;
+        document.getElementById('displayXP').innerText = xp + " XP";
+        document.getElementById('xpProg').style.width = Math.min((xp / 1000 * 100), 100) + "%";
+    });
+
+    // 2. Fil d'actualité
+    onSnapshot(query(collection(db, "posts"), orderBy("date", "desc"), limit(25)), (snap) => {
         const zone = document.getElementById('feedContent');
         zone.innerHTML = "";
-        
-        p.forEach((x, index) => {
-            let info = db.find(u => u.pseudo === x.auteur);
-            let pfp = (info && info.photo) ? info.photo : "https://ui-avatars.com/api/?name="+x.auteur;
-            let targetId = x.id ? x.id : index;
-            let delBtn = (x.auteur === user) ? `<button class="delete-btn" onclick="supprimerPost(${targetId})">✕</button>` : '';
-
+        snap.forEach(d => {
+            const p = d.data();
             zone.innerHTML += `
-                <div class="post">
-                    ${delBtn}
-                    <div class="post-header">
-                        <img src="${pfp}" class="mini-avatar">
-                        <div><b>${x.auteur}</b><br><small style="color:gray;">${x.date || ''}</small></div>
-                    </div>
-                    <div style="white-space: pre-wrap;">${x.texte}</div>
-                    ${x.image ? `<img src="${x.image}" class="post-img">` : ''}
+                <div class="card post">
+                    <b>@${p.auteur}</b>
+                    <p>${p.contenu}</p>
+                    <button class="reac-btn" onclick="aimer('${d.id}', '${p.auteur}')">❤️ ${p.likes || 0}</button>
                 </div>`;
         });
-    }
+    });
 
-    // --- GALERIE ---
-    function afficherGalerie() {
-        let p = JSON.parse(localStorage.getItem("mes_posts")) || [];
-        const zone = document.getElementById('galContent');
+    // 3. Classement
+    onSnapshot(query(collection(db, "citoyens"), orderBy("xp", "desc"), limit(10)), (snap) => {
+        const list = document.getElementById('rankList');
+        list.innerHTML = "";
+        let i = 1;
+        snap.forEach(d => {
+            const u = d.data();
+            list.innerHTML += `
+                <div class="rank-item">
+                    <span class="rank-pos ${i<=3?'rank-'+i:''}">${i === 1 ? '🥇' : i === 2 ? '🥈' : i === 3 ? '🥉' : i}</span>
+                    <img src="https://ui-avatars.com/api/?name=${d.id}&background=random" style="width:30px; border-radius:50%;">
+                    <b style="flex:1;">@${d.id}</b>
+                    <span style="color:var(--accent); font-weight:bold;">${u.xp || 0} XP</span>
+                </div>`;
+            i++;
+        });
+    });
+
+    // 4. Chat
+    onSnapshot(query(collection(db, "messages"), orderBy("date", "asc"), limit(40)), (snap) => {
+        const zone = document.getElementById('chatContent');
         zone.innerHTML = "";
-        p.filter(post => post.image).forEach(post => {
-            zone.innerHTML += `<img src="${post.image}" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px; box-shadow:var(--shadow);">`;
+        snap.forEach(d => {
+            const m = d.data();
+            const isMe = m.auteur === currentUser ? "my-msg" : "";
+            zone.innerHTML += `<div class="msg ${isMe}"><small style="font-size:0.6rem; opacity:0.7;">${m.auteur}</small><br>${m.texte}</div>`;
         });
-    }
+        zone.scrollTop = zone.scrollHeight;
+    });
 
-    // --- MESSAGERIE ---
-    function envoyerMP() {
-        const dest = document.getElementById('destinataire').value;
-        const txt = document.getElementById('mTxt').value;
-        if(!dest || !txt) return notifier("Erreur de saisie", "⚠️");
-
-        let mps = JSON.parse(localStorage.getItem("mes_mps")) || [];
-        mps.push({ de: user, pour: dest, texte: txt, date: new Date().toLocaleTimeString(), lu: false });
-        localStorage.setItem("mes_mps", JSON.stringify(mps));
-        document.getElementById('mTxt').value = "";
-        notifier("Message envoyé !");
-        afficherMessages();
-    }
-
-    function chargerMessagerie() {
-        const db = JSON.parse(localStorage.getItem("db_social")) || [];
-        const select = document.getElementById('destinataire');
-        select.innerHTML = '<option value="">Envoyer à...</option>';
-        db.filter(u => u.pseudo !== user).forEach(u => select.innerHTML += `<option value="${u.pseudo}">${u.pseudo}</option>`);
-        
-        // Marquer comme lu
-        let mps = JSON.parse(localStorage.getItem("mes_mps")) || [];
-        mps.forEach(m => { if(m.pour === user) m.lu = true; });
-        localStorage.setItem("mes_mps", JSON.stringify(mps));
-        afficherMessages();
-    }
-
-    function afficherMessages() {
-        const mps = JSON.parse(localStorage.getItem("mes_mps")) || [];
-        const box = document.getElementById('chatBox');
-        box.innerHTML = "";
-        mps.filter(m => m.de === user || m.pour === user).forEach(m => {
-            let side = (m.de === user) ? 'sent' : 'received';
-            box.innerHTML += `<div class="msg ${side}">${m.texte}</div>`;
-        });
-        box.scrollTop = box.scrollHeight;
-    }
-
-    function verifierBadge() {
-        let mps = JSON.parse(localStorage.getItem("mes_mps")) || [];
-        let nonLu = mps.some(m => m.pour === user && !m.lu);
-        document.getElementById('notifBadge').style.display = nonLu ? 'block' : 'none';
-    }
-
-    // --- PROFIL ---
-    function chargerProfil() {
-        document.getElementById('myName').innerText = user;
-        let db = JSON.parse(localStorage.getItem("db_social")) || [];
-        let info = db.find(u => u.pseudo === user);
-        document.getElementById('myAvatar').src = info.photo || "https://ui-avatars.com/api/?name="+user;
-    }
-
-    function sauvegarderProfil() {
-        let n = document.getElementById('newName').value;
-        let p = document.getElementById('newPic').files[0];
-        let db = JSON.parse(localStorage.getItem("db_social"));
-        let idx = db.findIndex(u => u.pseudo === user);
-
-        if(p) {
-            let r = new FileReader(); r.readAsDataURL(p);
-            r.onload = () => { db[idx].photo = r.result; finalizeProfil(db, n, idx); };
-        } else finalizeProfil(db, n, idx);
-    }
-
-    function finalizeProfil(db, nName, idx) {
-        if(nName && nName !== user) {
-            let posts = JSON.parse(localStorage.getItem("mes_posts")) || [];
-            posts.forEach(p => { if(p.auteur === user) p.auteur = nName; });
-            localStorage.setItem("mes_posts", JSON.stringify(posts));
-            db[idx].pseudo = nName;
-            user = nName;
-            localStorage.setItem("currentUser", nName);
-        }
-        localStorage.setItem("db_social", JSON.stringify(db));
-        notifier("Profil mis à jour", "👤");
-        chargerProfil();
-    }
-
-    function retirerPhoto() {
-        let db = JSON.parse(localStorage.getItem("db_social"));
-        let idx = db.findIndex(u => u.pseudo === user);
-        db[idx].photo = null;
-        localStorage.setItem("db_social", JSON.stringify(db));
-        notifier("Photo retirée");
-        chargerProfil();
-    }
-
-    function logout() { localStorage.removeItem("currentUser"); window.location.href = "index.html"; }
-
-    // Démarrage
-    window.onload = () => { afficherFeed(); setInterval(verifierBadge, 3000); };
 </script>
 </body>
 </html>
