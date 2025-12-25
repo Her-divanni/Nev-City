@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tena Iz - Connexion</title>
+    <style>
+        :root {
+            --pink-main: #ff69b4;
+            --pink-light: #fff0f6;
+            --pink-soft: #fce4ec;
+            --shadow: 0 10px 25px rgba(255, 105, 180, 0.15);
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: linear-gradient(135deg, var(--pink-light) 0%, #ffffff 100%);
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; 
+        }
+
+        .card { 
+            background: white; padding: 40px 30px; border-radius: 30px; 
+            box-shadow: var(--shadow); width: 90%; max-width: 380px; 
+            text-align: center; transition: 0.3s;
+        }
+
+        h1 { color: var(--pink-main); font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+        p { color: #888; font-size: 14px; margin-bottom: 30px; }
+
+        .input-group { position: relative; margin-bottom: 15px; }
+        
+        input { 
+            width: 100%; padding: 15px 20px; border: 1px solid #eee; 
+            border-radius: 15px; box-sizing: border-box; outline: none; 
+            background: #fdfdfd; font-size: 15px; transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--pink-main); box-shadow: 0 0 0 4px var(--pink-light); }
+
+        .toggle-pass { 
+            position: absolute; right: 15px; top: 15px; 
+            cursor: pointer; color: var(--pink-main); opacity: 0.7; 
+        }
+
+        .btn-main { 
+            background: var(--pink-main); color: white; border: none; 
+            padding: 15px; width: 100%; border-radius: 15px; 
+            font-weight: bold; font-size: 16px; cursor: pointer; 
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3); transition: 0.3s;
+        }
+
+        .btn-main:active { transform: scale(0.97); }
+
+        .btn-link { 
+            background: none; border: none; color: var(--pink-main); 
+            font-weight: 600; cursor: pointer; margin-top: 20px; font-size: 14px;
+        }
+
+        .hidden { display: none; }
+        
+        .error-msg { 
+            color: #d32f2f; font-size: 12px; margin-top: 5px; 
+            text-align: left; display: block; font-weight: 500;
+        }
+
+        /* Petite barre de force de mot de passe */
+        .strength-meter {
+            height: 4px; width: 0%; background: #eee;
+            margin-top: -10px; margin-bottom: 15px; border-radius: 2px; transition: 0.5s;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div id="loginSection">
+        <h1>Bienvenue 🌸</h1>
+        <p>Connectez-vous pour voir les posts</p>
+        
+        <div class="input-group">
+            <input type="text" id="userL" placeholder="Pseudo">
+        </div>
+        
+        <div class="input-group">
+            <input type="password" id="passL" placeholder="Mot de passe">
+            <span class="toggle-pass" onclick="toggleView('passL')">👁️</span>
+        </div>
+        
+        <button class="btn-main" onclick="connexion()">Se connecter</button>
+        <button class="btn-link" onclick="switchMode(true)">Créer un compte</button>
+    </div>
+
+    <div id="regSection" class="hidden">
+        <h1>Inscription 📝</h1>
+        <p>Rejoignez la communauté Tena Iz</p>
+        
+        <div class="input-group">
+            <input type="text" id="userR" placeholder="Choisissez un pseudo">
+        </div>
+        
+        <div class="input-group">
+            <input type="password" id="passR" placeholder="Mot de passe" oninput="checkStrength(this.value)">
+            <span class="toggle-pass" onclick="toggleView('passR')">👁️</span>
+        </div>
+        <div id="meter" class="strength-meter"></div>
+        
+        <div class="input-group">
+            <input type="password" id="confR" placeholder="Confirmez le mot de passe">
+        </div>
+        
+        <span id="regError" class="error-msg"></span>
+        
+        <button class="btn-main" onclick="inscription()">Créer mon compte</button>
+        <button class="btn-link" onclick="switchMode(false)">Déjà inscrit ? Connexion</button>
+    </div>
+</div>
+
+<script>
+    function toggleView(id) {
+        const input = document.getElementById(id);
+        input.type = input.type === "password" ? "text" : "password";
+    }
+
+    function switchMode(isReg) {
+        document.getElementById('loginSection').classList.toggle('hidden', isReg);
+        document.getElementById('regSection').classList.toggle('hidden', !isReg);
+    }
+
+    function checkStrength(p) {
+        const meter = document.getElementById('meter');
+        let width = 0;
+        if(p.length > 5) width = 33;
+        if(/[A-Z]/.test(p) && /\d/.test(p) && p.length > 7) width = 100;
+        
+        meter.style.width = width + "%";
+        meter.style.background = width === 100 ? "#4CAF50" : width === 33 ? "#FFC107" : "#F44336";
+    }
+
+    function inscription() {
+        const u = document.getElementById('userR').value;
+        const p = document.getElementById('passR').value;
+        const c = document.getElementById('confR').value;
+        const err = document.getElementById('regError');
+
+        if(u.length < 3) { err.innerText = "Pseudo trop court"; return; }
+        if(p.length < 8 || !/[A-Z]/.test(p)) { err.innerText = "Mot de passe trop faible"; return; }
+        if(p !== c) { err.innerText = "Les mots de passe diffèrent"; return; }
+
+        let db = JSON.parse(localStorage.getItem("db_social")) || [];
+        if(db.find(x => x.pseudo === u)) { err.innerText = "Pseudo déjà pris"; return; }
+
+        db.push({ pseudo: u, mdp: btoa(p) });
+        localStorage.setItem("db_social", JSON.stringify(db));
+        alert("Compte créé !");
+        switchMode(false);
+    }
+
+    function connexion() {
+        const u = document.getElementById('userL').value;
+        const p = document.getElementById('passL').value;
+        let db = JSON.parse(localStorage.getItem("db_social")) || [];
+
+        const user = db.find(x => x.pseudo === u && atob(x.mdp) === p);
+        if(user) {
+            localStorage.setItem("currentUser", u);
+            window.location.href = "acceuil.html";
+        } else {
+            alert("Identifiants incorrects ❌");
+        }
+    }
+</script>
+</body>
+</html>
