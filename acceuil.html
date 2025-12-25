@@ -3,216 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nv'City - Version Ultime</title>
+    <title>Tena Iz - Cloud Edition</title>
     <style>
-        :root { --accent: #ff69b4; --bg: #f0f2f5; --gold: #ffd700; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        /* Header & Barre XP */
-        header { background: white; padding: 10px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 100; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; }
-        .xp-bar { height: 6px; background: #eee; width: 100%; margin-top: 8px; border-radius: 3px; overflow: hidden; }
-        .xp-progress { height: 100%; background: var(--accent); width: 0%; transition: 0.8s; }
-
-        /* Onglets */
-        .tabs { display: flex; background: white; border-bottom: 1px solid #ddd; flex-shrink: 0; }
-        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; font-weight: bold; color: gray; font-size: 0.85rem; }
-        .tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
-
-        .content { flex: 1; overflow-y: auto; padding: 15px; }
-        .hidden { display: none; }
-
-        /* Design des Cartes (Posts & Classement) */
-        .card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .post b { color: #333; font-size: 0.9rem; }
-        .post p { margin: 8px 0; color: #555; }
-        
-        .reac-btn { background: #fff0f6; border: none; border-radius: 20px; padding: 6px 15px; cursor: pointer; color: var(--accent); font-weight: bold; font-size: 0.8rem; }
-        
-        /* Classement */
-        .rank-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid #eee; }
-        .rank-pos { font-weight: bold; width: 25px; color: #888; }
-        .rank-1 { color: var(--gold); font-size: 1.2rem; }
-
-        /* Chat */
-        .chat-zone { display: flex; flex-direction: column; height: 100%; }
-        #chatContent { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 10px; }
-        .msg { background: white; padding: 8px 12px; border-radius: 12px; width: fit-content; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .my-msg { align-self: flex-end; background: var(--accent); color: white; }
-
-        /* Inputs */
-        .input-box { display: flex; gap: 10px; background: white; padding: 10px; border-radius: 25px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        input { flex: 1; border: none; outline: none; background: transparent; }
+        :root { --pink-main: #ff69b4; --pink-light: #fff0f6; --shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--pink-light); margin: 0; padding-bottom: 50px; }
+        header { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        header span { color: var(--pink-main); font-weight: 800; font-size: 1.3rem; }
+        .container { max-width: 500px; margin: auto; padding: 10px; }
+        .tabs { display: flex; background: white; margin: 15px 0; border-radius: 15px; padding: 5px; box-shadow: var(--shadow); position: sticky; top: 70px; z-index: 900; }
+        .tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; border-radius: 12px; font-weight: 600; color: #888; font-size: 13px; transition: 0.3s; }
+        .tab.active { background: var(--pink-main); color: white; }
+        .card, .post { background: white; padding: 20px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 20px; position: relative; }
+        .post-header { display: flex; align-items: center; margin-bottom: 12px; }
+        .mini-avatar { width: 45px; height: 45px; border-radius: 50%; margin-right: 12px; border: 1px solid #eee; }
+        .post-img { width: 100%; border-radius: 15px; margin-top: 12px; }
+        .btn-main { background: var(--pink-main); color: white; border: none; padding: 14px; border-radius: 15px; font-weight: bold; width: 100%; cursor: pointer; }
+        .hidden { display: none !important; }
+        textarea, input { width: 100%; border: 1px solid #eee; background: #fbfbfb; border-radius: 12px; padding: 12px; margin-bottom: 10px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="top-bar">
-        <h1>🏙️ Nv'City</h1>
-        <div onclick="changerPseudo()" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-            <div style="text-align: right;">
-                <span id="displayPseudo" style="font-weight:bold; font-size:0.85rem;">...</span><br>
-                <small id="displayXP" style="color:var(--accent); font-weight:bold;">0 XP</small>
-            </div>
-            <img id="myAvatar" src="" style="width:35px; height:35px; border-radius:50%; border:2px solid var(--accent);">
-        </div>
-    </div>
-    <div class="xp-bar"><div id="xpProg" class="xp-progress"></div></div>
+    <span>🌸 Tena Iz</span>
+    <button onclick="localStorage.removeItem('currentUser'); location.reload();" style="border:none; background:none; color:#999; font-weight:600;">Quitter</button>
 </header>
 
-<div class="tabs">
-    <div id="tabFeed" class="tab active" onclick="switchTab('feed')">FIL</div>
-    <div id="tabRank" class="tab" onclick="switchTab('rank')">TOP 10</div>
-    <div id="tabChat" class="tab" onclick="switchTab('chat')">CHAT</div>
-</div>
-
-<div id="secFeed" class="content">
-    <div class="input-box">
-        <input type="text" id="pTxt" placeholder="Quoi de neuf dans la city ?">
-        <button onclick="publier()" style="background:var(--accent); color:white; border:none; padding:8px 15px; border-radius:20px; font-weight:bold; cursor:pointer;">POST</button>
+<div class="container">
+    <div class="tabs">
+        <div id="tFeed" class="tab active" onclick="switchTab('feed')">Fil</div>
+        <div id="tGal" class="tab" onclick="switchTab('gal')">Galerie</div>
+        <div id="tProf" class="tab" onclick="switchTab('prof')">Profil</div>
     </div>
-    <div id="feedContent"></div>
-</div>
 
-<div id="secRank" class="content hidden">
-    <div class="card">
-        <h3 style="margin-top:0; text-align:center;">🏆 Meilleurs Citoyens</h3>
-        <div id="rankList"></div>
+    <div id="secFeed">
+        <div class="card">
+            <textarea id="pTxt" placeholder="Quoi de neuf ?"></textarea>
+            <input type="file" id="pImg" accept="image/*">
+            <button class="btn-main" id="btnPublier">Partager sur le Cloud</button>
+        </div>
+        <div id="feedContent">Chargement...</div>
     </div>
-</div>
 
-<div id="secChat" class="content hidden" style="background: #e5ddd5;">
-    <div class="chat-zone">
-        <div id="chatContent"></div>
-        <div class="input-box">
-            <input type="text" id="cTxt" placeholder="Message direct...">
-            <button onclick="envoyerChat()" style="background:var(--accent); color:white; border:none; border-radius:50%; width:35px; height:35px; cursor:pointer;">🚀</button>
+    <div id="secGal" class="hidden">
+        <div id="galContent" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;"></div>
+    </div>
+
+    <div id="secProf" class="hidden">
+        <div class="card" style="text-align:center;">
+            <img id="myAvatar" src="" class="mini-avatar" style="width:100px; height:100px;">
+            <h2 id="myName">Pseudo</h2>
+            <input type="text" id="newName" placeholder="Changer de pseudo">
+            <button class="btn-main" onclick="updatePseudo()">Sauvegarder</button>
         </div>
     </div>
 </div>
 
 <script type="module">
-    // INITIALISATION FIREBASE (Ligne 58 environ)
+    // --- INITIALISATION FIREBASE ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, updateDoc, increment, setDoc, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyDXEUHxufBZyRcoa6bExcN-QFqcb5zyBm4",
-        authDomain: "nv-city-2f51d.firebaseapp.com",
-        projectId: "nv-city-2f51d",
-        storageBucket: "nv-city-2f51d.firebasestorage.app",
-        messagingSenderId: "313757648006",
-        appId: "1:313757648006:web:c8f83006358be09f267d07",
-        measurementId: "G-F78EWDN1M6"
+      apiKey: "AIzaSyDXEUHxufBZyRcoa6bExcN-QFqcb5zyBm4",
+      authDomain: "nv-city-2f51d.firebaseapp.com",
+      projectId: "nv-city-2f51d",
+      storageBucket: "nv-city-2f51d.firebasestorage.app",
+      messagingSenderId: "313757648006",
+      appId: "1:313757648006:web:c8f83006358be09f267d07",
+      measurementId: "G-F78EWDN1M6"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // GESTION UTILISATEUR
-    let currentUser = localStorage.getItem("pseudo") || "Citoyen" + Math.floor(Math.random()*999);
-    
-    window.updateUI = () => {
-        document.getElementById('displayPseudo').innerText = "@" + currentUser;
-        document.getElementById('myAvatar').src = `https://ui-avatars.com/api/?name=${currentUser}&background=ff69b4&color=fff`;
-    };
-    updateUI();
+    let user = localStorage.getItem("currentUser") || "Invitée_" + Math.floor(Math.random()*999);
+    localStorage.setItem("currentUser", user);
 
-    window.changerPseudo = () => {
-        const p = prompt("Choisis ton pseudo Nv'City :", currentUser);
-        if(p && p.trim()) { localStorage.setItem("pseudo", p.trim()); location.reload(); }
+    // --- NAVIGATION ---
+    window.switchTab = (mode) => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('secFeed').classList.add('hidden');
+        document.getElementById('secGal').classList.add('hidden');
+        document.getElementById('secProf').classList.add('hidden');
+
+        document.getElementById('t' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+        document.getElementById('sec' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.remove('hidden');
+        
+        if(mode === 'prof') {
+            document.getElementById('myName').innerText = user;
+            document.getElementById('myAvatar').src = `https://ui-avatars.com/api/?name=${user}&background=ff69b4&color=fff`;
+        }
     };
 
-    // SYSTÈME XP
-    async function addXP(pts) {
-        await updateDoc(doc(db, "citoyens", currentUser), { xp: increment(pts) });
+    window.updatePseudo = () => {
+        const n = document.getElementById('newName').value;
+        if(n) { localStorage.setItem("currentUser", n); location.reload(); }
+    };
+
+    // --- PUBLICATION (FIREBASE) ---
+    document.getElementById('btnPublier').onclick = async () => {
+        const text = document.getElementById('pTxt').value;
+        const file = document.getElementById('pImg').files[0];
+        if(!text && !file) return;
+
+        let base64 = null;
+        if(file) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                await sendToCloud(text, reader.result);
+            };
+        } else {
+            await sendToCloud(text, null);
+        }
+    };
+
+    async function sendToCloud(t, img) {
+        await addDoc(collection(db, "posts"), {
+            auteur: user,
+            texte: t,
+            image: img,
+            date: serverTimestamp()
+        });
+        document.getElementById('pTxt').value = "";
+        document.getElementById('pImg').value = "";
+        alert("Envoyé au Cloud ! 🌸");
     }
 
-    // ACTIONS
-    window.publier = async () => {
-        const t = document.getElementById('pTxt').value;
-        if(!t.trim()) return;
-        await addDoc(collection(db, "posts"), { auteur: currentUser, contenu: t, date: serverTimestamp(), likes: 0 });
-        await addXP(10);
-        document.getElementById('pTxt').value = "";
-    };
-
-    window.aimer = async (id, auteurPost) => {
-        await updateDoc(doc(db, "posts", id), { likes: increment(1) });
-        if(auteurPost !== currentUser) await addXP(2); // XP pour celui qui like
-    };
-
-    window.envoyerChat = async () => {
-        const t = document.getElementById('cTxt').value;
-        if(!t.trim()) return;
-        await addDoc(collection(db, "messages"), { auteur: currentUser, texte: t, date: serverTimestamp() });
-        document.getElementById('cTxt').value = "";
-    };
-
-    // NAVIGATION
-    window.switchTab = (t) => {
-        document.getElementById('secFeed').classList.toggle('hidden', t !== 'feed');
-        document.getElementById('secRank').classList.toggle('hidden', t !== 'rank');
-        document.getElementById('secChat').classList.toggle('hidden', t !== 'chat');
-        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-        document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('active');
-    };
-
-    // TEMPS RÉEL
-    // 1. Profil & XP
-    onSnapshot(doc(db, "citoyens", currentUser), (d) => {
-        if(!d.exists()) { setDoc(doc(db, "citoyens", currentUser), { xp: 0 }); return; }
-        const xp = d.data().xp || 0;
-        document.getElementById('displayXP').innerText = xp + " XP";
-        document.getElementById('xpProg').style.width = Math.min((xp / 1000 * 100), 100) + "%";
-    });
-
-    // 2. Fil d'actualité
-    onSnapshot(query(collection(db, "posts"), orderBy("date", "desc"), limit(25)), (snap) => {
+    // --- LECTURE EN TEMPS RÉEL (FIREBASE) ---
+    onSnapshot(query(collection(db, "posts"), orderBy("date", "desc"), limit(20)), (snap) => {
         const zone = document.getElementById('feedContent');
+        const galZone = document.getElementById('galContent');
         zone.innerHTML = "";
-        snap.forEach(d => {
-            const p = d.data();
+        galZone.innerHTML = "";
+
+        snap.forEach(doc => {
+            const p = doc.data();
+            const pfp = `https://ui-avatars.com/api/?name=${p.auteur}&background=random`;
+            
+            // Ajout au fil
             zone.innerHTML += `
-                <div class="card post">
-                    <b>@${p.auteur}</b>
-                    <p>${p.contenu}</p>
-                    <button class="reac-btn" onclick="aimer('${d.id}', '${p.auteur}')">❤️ ${p.likes || 0}</button>
+                <div class="post">
+                    <div class="post-header">
+                        <img src="${pfp}" class="mini-avatar">
+                        <div><b>${p.auteur}</b></div>
+                    </div>
+                    <div>${p.texte}</div>
+                    ${p.image ? `<img src="${p.image}" class="post-img">` : ''}
                 </div>`;
+            
+            // Ajout à la galerie
+            if(p.image) {
+                galZone.innerHTML += `<img src="${p.image}" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px;">`;
+            }
         });
     });
-
-    // 3. Classement
-    onSnapshot(query(collection(db, "citoyens"), orderBy("xp", "desc"), limit(10)), (snap) => {
-        const list = document.getElementById('rankList');
-        list.innerHTML = "";
-        let i = 1;
-        snap.forEach(d => {
-            const u = d.data();
-            list.innerHTML += `
-                <div class="rank-item">
-                    <span class="rank-pos ${i<=3?'rank-'+i:''}">${i === 1 ? '🥇' : i === 2 ? '🥈' : i === 3 ? '🥉' : i}</span>
-                    <img src="https://ui-avatars.com/api/?name=${d.id}&background=random" style="width:30px; border-radius:50%;">
-                    <b style="flex:1;">@${d.id}</b>
-                    <span style="color:var(--accent); font-weight:bold;">${u.xp || 0} XP</span>
-                </div>`;
-            i++;
-        });
-    });
-
-    // 4. Chat
-    onSnapshot(query(collection(db, "messages"), orderBy("date", "asc"), limit(40)), (snap) => {
-        const zone = document.getElementById('chatContent');
-        zone.innerHTML = "";
-        snap.forEach(d => {
-            const m = d.data();
-            const isMe = m.auteur === currentUser ? "my-msg" : "";
-            zone.innerHTML += `<div class="msg ${isMe}"><small style="font-size:0.6rem; opacity:0.7;">${m.auteur}</small><br>${m.texte}</div>`;
-        });
-        zone.scrollTop = zone.scrollHeight;
-    });
-
 </script>
 </body>
-    </html>
+</html>
