@@ -2,132 +2,137 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, virtual-keyboard=interactive-widget">
     <title>Mi-Kura Messenger</title>
     <style>
-        :root { --pink: #ff69b4; --bg: #fdfdfd; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: white; padding-bottom: 70px; }
+        :root { --pink: #ff69b4; --bg: #000000; --card: #121212; --text: #ffffff; }
+        
+        /* EMPECHE LE CLAVIER DE CACHER LE CONTENU */
+        html, body { height: 100%; overflow: hidden; margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; }
+        
         .hidden { display: none !important; }
         
-        /* AUTH SCREEN */
-        .auth-screen { position: fixed; inset: 0; background: white; z-index: 5000; overflow-y: auto; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; }
-        .auth-container { width: 100%; max-width: 400px; }
-        .input-box { margin-bottom: 12px; width: 100%; }
-        label { font-size: 12px; color: #666; font-weight: bold; }
-        input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; margin-top: 5px; box-sizing: border-box; font-size: 14px; }
+        /* STRUCTURE PRINCIPALE */
+        #app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+        .content-area { flex: 1; overflow-y: auto; padding-bottom: 20px; }
         
-        /* APP INTERFACE */
-        header { background: white; padding: 15px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
-        .logo-text { color: var(--pink); font-weight: 800; font-size: 1.5rem; margin: 0; }
-        .container { max-width: 500px; margin: auto; }
+        header { padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        .logo-text { color: var(--pink); font-weight: 800; font-size: 1.5rem; font-style: italic; }
 
-        /* LISTS */
-        .item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #f9f9f9; cursor: pointer; }
-        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #eee; margin-right: 15px; object-fit: cover; }
+        /* LISTES */
+        .item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1a1a1a; cursor: pointer; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #333; margin-right: 15px; object-fit: cover; border: 1.5px solid var(--pink); }
+        .item-info { flex: 1; }
+        .item-name { font-weight: bold; font-size: 15px; margin-bottom: 2px; }
+        .item-last { font-size: 12px; color: #888; }
+
+        /* FENETRE DE CHAT OPTIMISÉE POUR LE CLAVIER */
+        #chatWindow { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: none; flex-direction: column; }
         
-        /* CHAT */
-        #chatWindow { position: fixed; inset: 0; background: white; z-index: 2000; display: none; flex-direction: column; }
-        .chat-header { padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; }
-        .messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; background: #fafafa; }
-        .bubble { padding: 10px 14px; border-radius: 18px; max-width: 75%; font-size: 14px; line-height: 1.4; }
-        .bubble.sent { background: var(--pink); color: white; align-self: flex-end; }
-        .bubble.received { background: #eee; align-self: flex-start; }
-        .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; display: block; }
+        /* Zone des messages qui s'adapte au clavier */
+        .messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 80px; }
         
-        .btn { padding: 12px 20px; background: var(--pink); color: white; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; width: 100%; }
+        .bubble { padding: 10px 14px; border-radius: 18px; max-width: 75%; font-size: 14px; word-wrap: break-word; }
+        .bubble.sent { background: var(--pink); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .bubble.received { background: #262626; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
+
+        /* BARRE DE SAISIE FIXÉE AU DESSUS DU CLAVIER */
+        .input-bar { 
+            padding: 10px; 
+            background: #121212; 
+            border-top: 1px solid #222; 
+            display: flex; 
+            gap: 10px; 
+            align-items: center;
+            position: sticky;
+            bottom: 0;
+        }
+        
+        .m-input { 
+            flex: 1; 
+            background: #222; 
+            border: none; 
+            color: white; 
+            padding: 12px 15px; 
+            border-radius: 25px; 
+            outline: none; 
+            font-size: 15px; 
+        }
 
         /* NAVIGATION */
-        .nav { position: fixed; bottom: 0; width: 100%; background: white; border-top: 1px solid #eee; display: flex; padding: 10px 0; }
-        .nav-item { flex: 1; text-align: center; font-size: 11px; color: #888; cursor: pointer; }
+        .nav { height: 65px; background: #000; border-top: 1px solid #222; display: flex; align-items: center; }
+        .nav-item { flex: 1; text-align: center; font-size: 10px; color: #555; cursor: pointer; }
         .nav-item.active { color: var(--pink); font-weight: bold; }
+
+        /* AUTH */
+        .auth-screen { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; overflow-y: auto; }
+        .input-box { width: 100%; max-width: 350px; margin-bottom: 15px; }
+        .input-box input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #111; color: white; box-sizing: border-box; }
+        .btn { width: 100%; max-width: 350px; padding: 14px; background: var(--pink); border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="authScreen" class="auth-screen">
-    <div class="auth-container">
-        <h1 style="color:var(--pink); text-align: center;">Mi-Kura</h1>
-        
-        <div class="input-box"><label>Email</label><input type="email" id="email" placeholder="exemple@mail.com"></div>
-        <div class="input-box"><label>Mot de passe</label><input type="password" id="pass"></div>
-        
-        <div id="registrationFields">
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-            <p style="font-size: 13px; color: var(--pink); font-weight: bold;">Nouvelle ici ? Remplis ces infos :</p>
-            <div class="input-box"><label>Pseudo</label><input type="text" id="regPseudo"></div>
-            <div class="input-box"><label>Adresse</label><input type="text" id="regAddress"></div>
-            <div class="input-box"><label>Date de naissance</label><input type="date" id="regBirth"></div>
-            <button class="btn" onclick="handleAuth('signup')" style="margin-top: 10px;">Créer mon compte</button>
-            <p onclick="toggleAuth(false)" style="text-align:center; font-size:12px; color:gray; cursor:pointer; margin-top:15px;">Déjà un compte ? Se connecter</p>
-        </div>
+    <h1 style="color:var(--pink); font-style: italic; font-size: 2.5rem;">Mi-Kura</h1>
+    <div class="input-box"><input type="email" id="email" placeholder="Email"></div>
+    <div class="input-box"><input type="password" id="pass" placeholder="Mot de passe"></div>
+    
+    <div id="registrationFields">
+        <div class="input-box"><input type="text" id="regCode" placeholder="Code Neviah2004"></div>
+        <div class="input-box"><input type="text" id="regPseudo" placeholder="Ton Pseudo"></div>
+        <button class="btn" onclick="handleAuth('signup')">S'inscrire</button>
+        <p onclick="toggleAuth(false)" style="color:#888; font-size:12px; margin-top:15px; cursor:pointer;">Déjà un compte ? Connexion</p>
+    </div>
 
-        <div id="loginFields" class="hidden">
-            <button class="btn" onclick="handleAuth('login')" style="margin-top: 10px; background:#666;">Se connecter</button>
-            <p onclick="toggleAuth(true)" style="text-align:center; font-size:12px; color:var(--pink); cursor:pointer; margin-top:15px;">Pas encore de compte ? S'inscrire</p>
-        </div>
+    <div id="loginFields" class="hidden">
+        <button class="btn" onclick="handleAuth('login')" style="background:#333;">Se connecter</button>
+        <p onclick="toggleAuth(true)" style="color:var(--pink); font-size:12px; margin-top:15px; cursor:pointer;">Créer un compte</p>
     </div>
 </div>
 
 <div id="app" class="hidden">
     <header>
         <div class="logo-text">Mi-Kura</div>
-        <div id="welcomeMsg" style="font-size: 12px; color: var(--pink); font-weight: bold;"></div>
+        <div id="welcomeMsg" style="color:var(--pink); font-size:12px;"></div>
     </header>
 
-    <div class="container">
-        <div id="tabMsg">
-            <div id="convList"></div>
-            <p style="text-align:center; color:#ccc; margin-top:50px;">Sélectionne un contact pour discuter</p>
-        </div>
-
-        <div id="tabContacts" class="hidden">
-            <div id="contactsList"></div>
-        </div>
-
-        <div id="tabAccount" class="hidden" style="padding: 20px; text-align:center;">
-            <div style="position: relative; display: inline-block;">
-                <img id="myPfp" src="" class="avatar" style="width:110px; height:110px;">
-                <label for="pfpInput" style="position: absolute; bottom: 0; right: 0; background: var(--pink); color: white; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; display:flex; align-items:center; justify-content:center; border: 3px solid white;">📷</label>
-                <input type="file" id="pfpInput" class="hidden" accept="image/*">
-            </div>
-            
-            <div style="text-align: left; margin-top: 20px;">
-                <div class="input-box"><label>Pseudo</label><input type="text" id="editPseudo"></div>
-                <div class="input-box"><label>Adresse</label><input type="text" id="editAddress"></div>
-                <div class="input-box"><label>Date de naissance</label><input type="date" id="editBirth"></div>
-                <button class="btn" onclick="updateProfile()" style="margin-top: 10px;">Enregistrer les modifications</button>
-            </div>
-
-            <button class="btn" onclick="logout()" style="background:#ff4757; margin-top:40px;">Déconnexion</button>
+    <div class="content-area">
+        <div id="tabMsg"><div id="convList"></div></div>
+        <div id="tabContacts" class="hidden"><div id="contactsList"></div></div>
+        <div id="tabAccount" class="hidden" style="text-align:center; padding-top:30px;">
+            <img id="myPfp" src="" class="avatar" style="width:100px; height:100px;">
+            <h2 id="dispPseudo"></h2>
+            <button class="btn" onclick="logout()" style="background:#cc0000; width:150px;">Déconnexion</button>
         </div>
     </div>
 
     <nav class="nav">
-        <div class="nav-item active" id="nMsg" onclick="switchTab('msg')">💬<br>Messages</div>
+        <div class="nav-item active" id="nMsg" onclick="switchTab('msg')">💬<br>Discussions</div>
         <div class="nav-item" id="nCont" onclick="switchTab('contacts')">👥<br>Contacts</div>
-        <div class="nav-item" id="nAcc" onclick="switchTab('account')">👤<br>Profil</div>
+        <div class="nav-item" id="nAcc" onclick="switchTab('account')">👤<br>Moi</div>
     </nav>
 </div>
 
 <div id="chatWindow">
-    <div class="chat-header">
-        <span onclick="closeChat()" style="cursor:pointer; font-size:28px; color:var(--pink)">‹</span>
-        <img id="chatAvatar" class="avatar" style="width:40px; height:40px; margin:0">
-        <b id="chatName" style="flex:1">...</b>
+    <div class="chat-header" style="background:#000; padding:10px;">
+        <span onclick="closeChat()" style="color:var(--pink); font-size:30px; padding:0 10px;">‹</span>
+        <img id="chatAvatar" class="avatar" style="width:35px; height:35px; margin:0">
+        <b id="chatName"></b>
     </div>
     <div class="messages" id="msgArea"></div>
-    <div style="padding:10px; display:flex; gap:10px; background:white; border-top:1px solid #eee; align-items:center;">
-        <label for="fileInput" style="font-size:28px; cursor:pointer; color:var(--pink)">+</label>
-        <input type="file" id="fileInput" class="hidden" accept="image/*, .pdf, .doc, .docx">
-        <input type="text" id="mInput" placeholder="Message..." style="margin:0">
-        <button class="btn" onclick="send()" style="width:auto;">Envoyer</button>
+    <div class="input-bar">
+        <input type="text" id="mInput" class="m-input" placeholder="Écris ici..." autocomplete="off">
+        <button onclick="send()" style="background:none; border:none; color:var(--pink); font-weight:bold; font-size:16px; padding:10px;">Envoyer</button>
     </div>
 </div>
+
+<audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"></audio>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, setDoc, doc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, setDoc, doc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDXEUHxufBZyRcoa6bExcN-QFqcb5zyBm4",
@@ -144,122 +149,94 @@
 
     let myEmail = "";
     let chatTarget = "";
+    let allUsers = {};
+    let lastMsgCount = 0;
 
-    // GESTION AFFICHAGE AUTH
+    // GESTION CLAVIER SMARTPHONE
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            document.body.style.height = window.visualViewport.height + 'px';
+            window.scrollTo(0, 0);
+            if(chatTarget) scrollBottom();
+        });
+    }
+
     window.toggleAuth = (isSignup) => {
         document.getElementById('registrationFields').classList.toggle('hidden', !isSignup);
         document.getElementById('loginFields').classList.toggle('hidden', isSignup);
     };
 
-    // LOGIQUE AUTHENTIFICATION
     window.handleAuth = async (mode) => {
         const e = document.getElementById('email').value;
         const p = document.getElementById('pass').value;
-
         if (mode === 'signup') {
             const pseudo = document.getElementById('regPseudo').value;
-            if(!e || !p || !pseudo) return alert("Email, mot de passe et pseudo obligatoires !");
+            if(document.getElementById('regCode').value !== "Neviah2004") return alert("Code Secret Incorrect");
             try {
                 await createUserWithEmailAndPassword(auth, e, p);
-                await setDoc(doc(db, "participants", e), {
-                    email: e, pseudo: pseudo,
-                    adresse: document.getElementById('regAddress').value || "",
-                    naissance: document.getElementById('regBirth').value || "",
-                    photo: `https://ui-avatars.com/api/?name=${pseudo}&background=ff69b4&color=fff`,
-                });
-            } catch(err) { alert(err.message); }
+                await setDoc(doc(db, "participants", e), { email: e, pseudo: pseudo, photo: `https://ui-avatars.com/api/?name=${pseudo}&background=ff69b4&color=fff` });
+            } catch(err) { alert("Erreur: " + err.message); }
         } else {
-            try { await signInWithEmailAndPassword(auth, e, p); } 
-            catch(err) { alert("Erreur : Vérifiez vos identifiants"); }
+            try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Email ou Pass incorrect"); }
         }
     };
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if(user) {
             myEmail = user.email;
             document.getElementById('authScreen').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
-            loadMyData(); loadContacts();
+            
+            const snap = await getDocs(collection(db, "participants"));
+            snap.forEach(d => allUsers[d.id] = d.data());
+            
+            loadRecentConvs();
+            loadContacts();
+            
+            document.getElementById('dispPseudo').innerText = allUsers[myEmail]?.pseudo || "";
+            document.getElementById('myPfp').src = allUsers[myEmail]?.photo || "";
         } else {
             document.getElementById('authScreen').classList.remove('hidden');
             document.getElementById('app').classList.add('hidden');
         }
     });
 
-    function loadMyData() {
-        onSnapshot(doc(db, "participants", myEmail), (d) => {
-            if(d.exists()) {
-                const data = d.data();
-                document.getElementById('editPseudo').value = data.pseudo;
-                document.getElementById('editAddress').value = data.adresse;
-                document.getElementById('editBirth').value = data.naissance;
-                document.getElementById('myPfp').src = data.photo;
-                document.getElementById('welcomeMsg').innerText = "Salut " + data.pseudo + " !";
+    function loadRecentConvs() {
+        onSnapshot(collection(db, "messages_prives"), (snap) => {
+            const list = document.getElementById('convList');
+            let lastOnes = {};
+            
+            // Notification si nouveau message
+            if(snap.size > lastMsgCount && lastMsgCount !== 0) {
+                document.getElementById('notifSound').play().catch(()=>{});
+                if(navigator.vibrate) navigator.vibrate(50);
             }
-        });
-    }
+            lastMsgCount = snap.size;
 
-    window.updateProfile = async () => {
-        await updateDoc(doc(db, "participants", myEmail), {
-            pseudo: document.getElementById('editPseudo').value,
-            adresse: document.getElementById('editAddress').value,
-            naissance: document.getElementById('editBirth').value
-        });
-        alert("Profil mis à jour !");
-    };
-
-    // LOGIQUE MESSAGERIE
-    window.send = async () => {
-        const txt = document.getElementById('mInput').value;
-        const fInput = document.getElementById('fileInput');
-        if (fInput.files[0]) {
-            const reader = new FileReader();
-            reader.readAsDataURL(fInput.files[0]);
-            reader.onload = async () => {
-                await addDoc(collection(db, "messages_prives"), {
-                    de: myEmail, pour: chatTarget, texte: txt,
-                    file: reader.result, fileType: fInput.files[0].type,
-                    date: serverTimestamp()
-                });
-                fInput.value = "";
-            };
-        } else if (txt) {
-            await addDoc(collection(db, "messages_prives"), {
-                de: myEmail, pour: chatTarget, texte: txt, date: serverTimestamp()
-            });
-        }
-        document.getElementById('mInput').value = "";
-    };
-
-    function loadMessages() {
-        const q = query(collection(db, "messages_prives"), orderBy("date", "asc"));
-        onSnapshot(q, (snap) => {
-            const area = document.getElementById('msgArea');
-            area.innerHTML = "";
             snap.forEach(d => {
                 const m = d.data();
-                if((m.de === myEmail && m.pour === chatTarget) || (m.de === chatTarget && m.pour === myEmail)) {
-                    const side = (m.de === myEmail) ? 'sent' : 'received';
-                    let html = `<div>${m.texte}</div>`;
-                    if(m.file) {
-                        if(m.fileType.includes('image')) html += `<img src="${m.file}" class="msg-img" onclick="window.open('${m.file}')">`;
-                        else html += `<br><a href="${m.file}" download style="color:inherit; font-weight:bold;">📄 Fichier</a>`;
-                    }
-                    area.innerHTML += `<div class="bubble ${side}">${html}</div>`;
+                if(m.de === myEmail || m.pour === myEmail) {
+                    const other = (m.de === myEmail) ? m.pour : m.de;
+                    if(!lastOnes[other] || m.date?.seconds > lastOnes[other].date?.seconds) lastOnes[other] = m;
                 }
             });
-            area.scrollTop = area.scrollHeight;
+
+            const sorted = Object.entries(lastOnes).sort((a,b) => (b[1].date?.seconds || 0) - (a[1].date?.seconds || 0));
+            list.innerHTML = sorted.length ? "" : "<p style='text-align:center;color:#444;margin-top:40px;'>Aucun message</p>";
+            
+            sorted.forEach(([email, m]) => {
+                const u = allUsers[email] || {pseudo: email, photo: ""};
+                list.innerHTML += `
+                    <div class="item" onclick="openChat('${email}', '${u.pseudo}', '${u.photo}')">
+                        <img src="${u.photo}" class="avatar">
+                        <div class="item-info">
+                            <div class="item-name">${u.pseudo}</div>
+                            <div class="item-last">${m.texte}</div>
+                        </div>
+                    </div>`;
+            });
         });
     }
-
-    // INTERFACE ET NAVIGATION
-    window.openChat = (email, name, photo) => {
-        chatTarget = email;
-        document.getElementById('chatName').innerText = name;
-        document.getElementById('chatAvatar').src = photo;
-        document.getElementById('chatWindow').style.display = 'flex';
-        loadMessages();
-    };
 
     function loadContacts() {
         onSnapshot(collection(db, "participants"), (snap) => {
@@ -270,35 +247,62 @@
                     const u = d.data();
                     list.innerHTML += `<div class="item" onclick="openChat('${u.email}', '${u.pseudo}', '${u.photo}')">
                         <img src="${u.photo}" class="avatar">
-                        <div><b>${u.pseudo}</b></div>
+                        <div class="item-name">${u.pseudo}</div>
                     </div>`;
                 }
             });
         });
     }
 
+    window.openChat = (email, name, photo) => {
+        chatTarget = email;
+        document.getElementById('chatName').innerText = name;
+        document.getElementById('chatAvatar').src = photo;
+        document.getElementById('chatWindow').style.display = 'flex';
+        loadMessages();
+    };
+
+    window.send = async () => {
+        const input = document.getElementById('mInput');
+        if (input.value.trim()) {
+            await addDoc(collection(db, "messages_prives"), { de: myEmail, pour: chatTarget, texte: input.value, date: serverTimestamp() });
+            input.value = "";
+            input.focus();
+        }
+    };
+
+    function loadMessages() {
+        onSnapshot(collection(db, "messages_prives"), (snap) => {
+            const area = document.getElementById('msgArea');
+            area.innerHTML = "";
+            let msgs = [];
+            snap.forEach(d => msgs.push(d.data()));
+            msgs.sort((a,b) => (a.date?.seconds || 0) - (b.date?.seconds || 0));
+            msgs.forEach(m => {
+                if((m.de === myEmail && m.pour === chatTarget) || (m.de === chatTarget && m.pour === myEmail)) {
+                    const side = (m.de === myEmail) ? 'sent' : 'received';
+                    area.innerHTML += `<div class="bubble ${side}">${m.texte}</div>`;
+                }
+            });
+            scrollBottom();
+        });
+    }
+
+    function scrollBottom() {
+        const area = document.getElementById('msgArea');
+        area.scrollTop = area.scrollHeight;
+    }
+
     window.switchTab = (t) => {
         document.getElementById('tabMsg').classList.toggle('hidden', t !== 'msg');
         document.getElementById('tabContacts').classList.toggle('hidden', t !== 'contacts');
         document.getElementById('tabAccount').classList.toggle('hidden', t !== 'account');
-        document.getElementById('nMsg').classList.toggle('active', t === 'msg');
-        document.getElementById('nCont').classList.toggle('active', t === 'contacts');
-        document.getElementById('nAcc').classList.toggle('active', t === 'account');
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.getElementById('n' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('active');
     };
 
-    window.closeChat = () => document.getElementById('chatWindow').style.display = 'none';
+    window.closeChat = () => { chatTarget = ""; document.getElementById('chatWindow').style.display = 'none'; };
     window.logout = () => signOut(auth);
-
-    document.getElementById('pfpInput').onchange = (e) => {
-        const file = e.target.files[0];
-        if(file) {
-            const reader = new FileReader();
-            reader.onload = async (ev) => {
-                await updateDoc(doc(db, "participants", myEmail), { photo: ev.target.result });
-            };
-            reader.readAsDataURL(file);
-        }
-    };
 </script>
 </body>
 </html>
