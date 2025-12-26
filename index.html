@@ -3,172 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nv'City - Connexion</title>
+    <title>Mi-Kura Messenger</title>
     <style>
-        :root {
-            --pink-main: #ff69b4;
-            --pink-light: #fff0f6;
-            --pink-soft: #fce4ec;
-            --shadow: 0 10px 25px rgba(255, 105, 180, 0.15);
-        }
-
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: linear-gradient(135deg, var(--pink-light) 0%, #ffffff 100%);
-            display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; margin: 0; 
-        }
-
-        .card { 
-            background: white; padding: 40px 30px; border-radius: 30px; 
-            box-shadow: var(--shadow); width: 90%; max-width: 380px; 
-            text-align: center; transition: 0.3s;
-        }
-
-        h1 { color: var(--pink-main); font-size: 28px; font-weight: 800; margin-bottom: 10px; }
-        p { color: #888; font-size: 14px; margin-bottom: 30px; }
-
-        .input-group { position: relative; margin-bottom: 15px; }
+        :root { --pink: #ff69b4; --bg: #fdfdfd; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: white; padding-bottom: 70px; }
+        .hidden { display: none !important; }
         
-        input { 
-            width: 100%; padding: 15px 20px; border: 1px solid #eee; 
-            border-radius: 15px; box-sizing: border-box; outline: none; 
-            background: #fdfdfd; font-size: 15px; transition: 0.3s;
-        }
-
-        input:focus { border-color: var(--pink-main); box-shadow: 0 0 0 4px var(--pink-light); }
-
-        .toggle-pass { 
-            position: absolute; right: 15px; top: 15px; 
-            cursor: pointer; color: var(--pink-main); opacity: 0.7; 
-        }
-
-        .btn-main { 
-            background: var(--pink-main); color: white; border: none; 
-            padding: 15px; width: 100%; border-radius: 15px; 
-            font-weight: bold; font-size: 16px; cursor: pointer; 
-            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3); transition: 0.3s;
-        }
-
-        .btn-main:active { transform: scale(0.97); }
-
-        .btn-link { 
-            background: none; border: none; color: var(--pink-main); 
-            font-weight: 600; cursor: pointer; margin-top: 20px; font-size: 14px;
-        }
-
-        .hidden { display: none; }
+        /* AUTH SCREEN */
+        .auth-screen { position: fixed; inset: 0; background: white; z-index: 5000; overflow-y: auto; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; }
+        .auth-container { width: 100%; max-width: 400px; }
+        .input-box { margin-bottom: 12px; width: 100%; }
+        label { font-size: 12px; color: #666; font-weight: bold; }
+        input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; margin-top: 5px; box-sizing: border-box; font-size: 14px; }
         
-        .error-msg { 
-            color: #d32f2f; font-size: 12px; margin-top: 5px; 
-            text-align: left; display: block; font-weight: 500;
-        }
+        /* APP INTERFACE */
+        header { background: white; padding: 15px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .logo-text { color: var(--pink); font-weight: 800; font-size: 1.5rem; margin: 0; }
+        .container { max-width: 500px; margin: auto; }
 
-        /* Petite barre de force de mot de passe */
-        .strength-meter {
-            height: 4px; width: 0%; background: #eee;
-            margin-top: -10px; margin-bottom: 15px; border-radius: 2px; transition: 0.5s;
-        }
+        /* LISTS */
+        .item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #f9f9f9; cursor: pointer; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #eee; margin-right: 15px; object-fit: cover; }
+        
+        /* CHAT */
+        #chatWindow { position: fixed; inset: 0; background: white; z-index: 2000; display: none; flex-direction: column; }
+        .chat-header { padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; }
+        .messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; background: #fafafa; }
+        .bubble { padding: 10px 14px; border-radius: 18px; max-width: 75%; font-size: 14px; line-height: 1.4; }
+        .bubble.sent { background: var(--pink); color: white; align-self: flex-end; }
+        .bubble.received { background: #eee; align-self: flex-start; }
+        .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; display: block; }
+        
+        .btn { padding: 12px 20px; background: var(--pink); color: white; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; width: 100%; }
+
+        /* NAVIGATION */
+        .nav { position: fixed; bottom: 0; width: 100%; background: white; border-top: 1px solid #eee; display: flex; padding: 10px 0; }
+        .nav-item { flex: 1; text-align: center; font-size: 11px; color: #888; cursor: pointer; }
+        .nav-item.active { color: var(--pink); font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div id="loginSection">
-        <h1>Bienvenue 🌸</h1>
-        <p>Connectez-vous pour voir les posts</p>
+<div id="authScreen" class="auth-screen">
+    <div class="auth-container">
+        <h1 style="color:var(--pink); text-align: center;">Mi-Kura</h1>
         
-        <div class="input-group">
-            <input type="text" id="userL" placeholder="Pseudo">
+        <div class="input-box"><label>Email</label><input type="email" id="email" placeholder="exemple@mail.com"></div>
+        <div class="input-box"><label>Mot de passe</label><input type="password" id="pass"></div>
+        
+        <div id="registrationFields">
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="font-size: 13px; color: var(--pink); font-weight: bold;">Nouvelle ici ? Remplis ces infos :</p>
+            <div class="input-box"><label>Pseudo</label><input type="text" id="regPseudo"></div>
+            <div class="input-box"><label>Adresse</label><input type="text" id="regAddress"></div>
+            <div class="input-box"><label>Date de naissance</label><input type="date" id="regBirth"></div>
+            <button class="btn" onclick="handleAuth('signup')" style="margin-top: 10px;">Créer mon compte</button>
+            <p onclick="toggleAuth(false)" style="text-align:center; font-size:12px; color:gray; cursor:pointer; margin-top:15px;">Déjà un compte ? Se connecter</p>
         </div>
-        
-        <div class="input-group">
-            <input type="password" id="passL" placeholder="Mot de passe">
-            <span class="toggle-pass" onclick="toggleView('passL')">👁️</span>
-        </div>
-        
-        <button class="btn-main" onclick="connexion()">Se connecter</button>
-        <button class="btn-link" onclick="switchMode(true)">Créer un compte</button>
-    </div>
 
-    <div id="regSection" class="hidden">
-        <h1>Inscription 📝</h1>
-        <p>Rejoignez la communauté Nv'City</p>
-        
-        <div class="input-group">
-            <input type="text" id="userR" placeholder="Choisissez un pseudo">
+        <div id="loginFields" class="hidden">
+            <button class="btn" onclick="handleAuth('login')" style="margin-top: 10px; background:#666;">Se connecter</button>
+            <p onclick="toggleAuth(true)" style="text-align:center; font-size:12px; color:var(--pink); cursor:pointer; margin-top:15px;">Pas encore de compte ? S'inscrire</p>
         </div>
-        
-        <div class="input-group">
-            <input type="password" id="passR" placeholder="Mot de passe" oninput="checkStrength(this.value)">
-            <span class="toggle-pass" onclick="toggleView('passR')">👁️</span>
-        </div>
-        <div id="meter" class="strength-meter"></div>
-        
-        <div class="input-group">
-            <input type="password" id="confR" placeholder="Confirmez le mot de passe">
-        </div>
-        
-        <span id="regError" class="error-msg"></span>
-        
-        <button class="btn-main" onclick="inscription()">Créer mon compte</button>
-        <button class="btn-link" onclick="switchMode(false)">Déjà inscrit ? Connexion</button>
     </div>
 </div>
 
-<script>
-    function toggleView(id) {
-        const input = document.getElementById(id);
-        input.type = input.type === "password" ? "text" : "password";
-    }
+<div id="app" class="hidden">
+    <header>
+        <div class="logo-text">Mi-Kura</div>
+        <div id="welcomeMsg" style="font-size: 12px; color: var(--pink); font-weight: bold;"></div>
+    </header>
 
-    function switchMode(isReg) {
-        document.getElementById('loginSection').classList.toggle('hidden', isReg);
-        document.getElementById('regSection').classList.toggle('hidden', !isReg);
-    }
+    <div class="container">
+        <div id="tabMsg">
+            <div id="convList"></div>
+            <p style="text-align:center; color:#ccc; margin-top:50px;">Sélectionne un contact pour discuter</p>
+        </div>
 
-    function checkStrength(p) {
-        const meter = document.getElementById('meter');
-        let width = 0;
-        if(p.length > 5) width = 33;
-        if(/[A-Z]/.test(p) && /\d/.test(p) && p.length > 7) width = 100;
-        
-        meter.style.width = width + "%";
-        meter.style.background = width === 100 ? "#4CAF50" : width === 33 ? "#FFC107" : "#F44336";
-    }
+        <div id="tabContacts" class="hidden">
+            <div id="contactsList"></div>
+        </div>
 
-    function inscription() {
-        const u = document.getElementById('userR').value;
-        const p = document.getElementById('passR').value;
-        const c = document.getElementById('confR').value;
-        const err = document.getElementById('regError');
+        <div id="tabAccount" class="hidden" style="padding: 20px; text-align:center;">
+            <div style="position: relative; display: inline-block;">
+                <img id="myPfp" src="" class="avatar" style="width:110px; height:110px;">
+                <label for="pfpInput" style="position: absolute; bottom: 0; right: 0; background: var(--pink); color: white; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; display:flex; align-items:center; justify-content:center; border: 3px solid white;">📷</label>
+                <input type="file" id="pfpInput" class="hidden" accept="image/*">
+            </div>
+            
+            <div style="text-align: left; margin-top: 20px;">
+                <div class="input-box"><label>Pseudo</label><input type="text" id="editPseudo"></div>
+                <div class="input-box"><label>Adresse</label><input type="text" id="editAddress"></div>
+                <div class="input-box"><label>Date de naissance</label><input type="date" id="editBirth"></div>
+                <button class="btn" onclick="updateProfile()" style="margin-top: 10px;">Enregistrer les modifications</button>
+            </div>
 
-        if(u.length < 3) { err.innerText = "Pseudo trop court"; return; }
-        if(p.length < 8 || !/[A-Z]/.test(p)) { err.innerText = "Mot de passe trop faible"; return; }
-        if(p !== c) { err.innerText = "Les mots de passe diffèrent"; return; }
+            <button class="btn" onclick="logout()" style="background:#ff4757; margin-top:40px;">Déconnexion</button>
+        </div>
+    </div>
 
-        let db = JSON.parse(localStorage.getItem("db_social")) || [];
-        if(db.find(x => x.pseudo === u)) { err.innerText = "Pseudo déjà pris"; return; }
+    <nav class="nav">
+        <div class="nav-item active" id="nMsg" onclick="switchTab('msg')">💬<br>Messages</div>
+        <div class="nav-item" id="nCont" onclick="switchTab('contacts')">👥<br>Contacts</div>
+        <div class="nav-item" id="nAcc" onclick="switchTab('account')">👤<br>Profil</div>
+    </nav>
+</div>
 
-        db.push({ pseudo: u, mdp: btoa(p) });
-        localStorage.setItem("db_social", JSON.stringify(db));
-        alert("Compte créé !");
-        switchMode(false);
-    }
+<div id="chatWindow">
+    <div class="chat-header">
+        <span onclick="closeChat()" style="cursor:pointer; font-size:28px; color:var(--pink)">‹</span>
+        <img id="chatAvatar" class="avatar" style="width:40px; height:40px; margin:0">
+        <b id="chatName" style="flex:1">...</b>
+    </div>
+    <div class="messages" id="msgArea"></div>
+    <div style="padding:10px; display:flex; gap:10px; background:white; border-top:1px solid #eee; align-items:center;">
+        <label for="fileInput" style="font-size:28px; cursor:pointer; color:var(--pink)">+</label>
+        <input type="file" id="fileInput" class="hidden" accept="image/*, .pdf, .doc, .docx">
+        <input type="text" id="mInput" placeholder="Message..." style="margin:0">
+        <button class="btn" onclick="send()" style="width:auto;">Envoyer</button>
+    </div>
+</div>
 
-    function connexion() {
-        const u = document.getElementById('userL').value;
-        const p = document.getElementById('passL').value;
-        let db = JSON.parse(localStorage.getItem("db_social")) || [];
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, setDoc, doc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const user = db.find(x => x.pseudo === u && atob(x.mdp) === p);
-        if(user) {
-            localStorage.setItem("currentUser", u);
-            window.location.href = "acceuil.html";
+    const firebaseConfig = {
+      apiKey: "AIzaSyDXEUHxufBZyRcoa6bExcN-QFqcb5zyBm4",
+      authDomain: "nv-city-2f51d.firebaseapp.com",
+      projectId: "nv-city-2f51d",
+      storageBucket: "nv-city-2f51d.firebasestorage.app",
+      messagingSenderId: "313757648006",
+      appId: "1:313757648006:web:c8f83006358be09f267d07",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let myEmail = "";
+    let chatTarget = "";
+
+    // GESTION AFFICHAGE AUTH
+    window.toggleAuth = (isSignup) => {
+        document.getElementById('registrationFields').classList.toggle('hidden', !isSignup);
+        document.getElementById('loginFields').classList.toggle('hidden', isSignup);
+    };
+
+    // LOGIQUE AUTHENTIFICATION
+    window.handleAuth = async (mode) => {
+        const e = document.getElementById('email').value;
+        const p = document.getElementById('pass').value;
+
+        if (mode === 'signup') {
+            const pseudo = document.getElementById('regPseudo').value;
+            if(!e || !p || !pseudo) return alert("Email, mot de passe et pseudo obligatoires !");
+            try {
+                await createUserWithEmailAndPassword(auth, e, p);
+                await setDoc(doc(db, "participants", e), {
+                    email: e, pseudo: pseudo,
+                    adresse: document.getElementById('regAddress').value || "",
+                    naissance: document.getElementById('regBirth').value || "",
+                    photo: `https://ui-avatars.com/api/?name=${pseudo}&background=ff69b4&color=fff`,
+                });
+            } catch(err) { alert(err.message); }
         } else {
-            alert("Identifiants incorrects ❌");
+            try { await signInWithEmailAndPassword(auth, e, p); } 
+            catch(err) { alert("Erreur : Vérifiez vos identifiants"); }
         }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if(user) {
+            myEmail = user.email;
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            loadMyData(); loadContacts();
+        } else {
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('app').classList.add('hidden');
+        }
+    });
+
+    function loadMyData() {
+        onSnapshot(doc(db, "participants", myEmail), (d) => {
+            if(d.exists()) {
+                const data = d.data();
+                document.getElementById('editPseudo').value = data.pseudo;
+                document.getElementById('editAddress').value = data.adresse;
+                document.getElementById('editBirth').value = data.naissance;
+                document.getElementById('myPfp').src = data.photo;
+                document.getElementById('welcomeMsg').innerText = "Salut " + data.pseudo + " !";
+            }
+        });
     }
+
+    window.updateProfile = async () => {
+        await updateDoc(doc(db, "participants", myEmail), {
+            pseudo: document.getElementById('editPseudo').value,
+            adresse: document.getElementById('editAddress').value,
+            naissance: document.getElementById('editBirth').value
+        });
+        alert("Profil mis à jour !");
+    };
+
+    // LOGIQUE MESSAGERIE
+    window.send = async () => {
+        const txt = document.getElementById('mInput').value;
+        const fInput = document.getElementById('fileInput');
+        if (fInput.files[0]) {
+            const reader = new FileReader();
+            reader.readAsDataURL(fInput.files[0]);
+            reader.onload = async () => {
+                await addDoc(collection(db, "messages_prives"), {
+                    de: myEmail, pour: chatTarget, texte: txt,
+                    file: reader.result, fileType: fInput.files[0].type,
+                    date: serverTimestamp()
+                });
+                fInput.value = "";
+            };
+        } else if (txt) {
+            await addDoc(collection(db, "messages_prives"), {
+                de: myEmail, pour: chatTarget, texte: txt, date: serverTimestamp()
+            });
+        }
+        document.getElementById('mInput').value = "";
+    };
+
+    function loadMessages() {
+        const q = query(collection(db, "messages_prives"), orderBy("date", "asc"));
+        onSnapshot(q, (snap) => {
+            const area = document.getElementById('msgArea');
+            area.innerHTML = "";
+            snap.forEach(d => {
+                const m = d.data();
+                if((m.de === myEmail && m.pour === chatTarget) || (m.de === chatTarget && m.pour === myEmail)) {
+                    const side = (m.de === myEmail) ? 'sent' : 'received';
+                    let html = `<div>${m.texte}</div>`;
+                    if(m.file) {
+                        if(m.fileType.includes('image')) html += `<img src="${m.file}" class="msg-img" onclick="window.open('${m.file}')">`;
+                        else html += `<br><a href="${m.file}" download style="color:inherit; font-weight:bold;">📄 Fichier</a>`;
+                    }
+                    area.innerHTML += `<div class="bubble ${side}">${html}</div>`;
+                }
+            });
+            area.scrollTop = area.scrollHeight;
+        });
+    }
+
+    // INTERFACE ET NAVIGATION
+    window.openChat = (email, name, photo) => {
+        chatTarget = email;
+        document.getElementById('chatName').innerText = name;
+        document.getElementById('chatAvatar').src = photo;
+        document.getElementById('chatWindow').style.display = 'flex';
+        loadMessages();
+    };
+
+    function loadContacts() {
+        onSnapshot(collection(db, "participants"), (snap) => {
+            const list = document.getElementById('contactsList');
+            list.innerHTML = "";
+            snap.forEach(d => {
+                if(d.id !== myEmail) {
+                    const u = d.data();
+                    list.innerHTML += `<div class="item" onclick="openChat('${u.email}', '${u.pseudo}', '${u.photo}')">
+                        <img src="${u.photo}" class="avatar">
+                        <div><b>${u.pseudo}</b></div>
+                    </div>`;
+                }
+            });
+        });
+    }
+
+    window.switchTab = (t) => {
+        document.getElementById('tabMsg').classList.toggle('hidden', t !== 'msg');
+        document.getElementById('tabContacts').classList.toggle('hidden', t !== 'contacts');
+        document.getElementById('tabAccount').classList.toggle('hidden', t !== 'account');
+        document.getElementById('nMsg').classList.toggle('active', t === 'msg');
+        document.getElementById('nCont').classList.toggle('active', t === 'contacts');
+        document.getElementById('nAcc').classList.toggle('active', t === 'account');
+    };
+
+    window.closeChat = () => document.getElementById('chatWindow').style.display = 'none';
+    window.logout = () => signOut(auth);
+
+    document.getElementById('pfpInput').onchange = (e) => {
+        const file = e.target.files[0];
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                await updateDoc(doc(db, "participants", myEmail), { photo: ev.target.result });
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 </script>
 </body>
 </html>
