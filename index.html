@@ -2,102 +2,116 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, virtual-keyboard=interactive-widget">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Mi-Kura Messenger</title>
     <style>
-        :root { --pink: #ff69b4; --bg: #000000; --card: #121212; --text: #ffffff; }
+        :root { --pink: #ff69b4; --bg: #000000; --text: #ffffff; }
         
-        html, body { height: 100%; overflow: hidden; margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; }
+        body { 
+            margin: 0; padding: 0; background: var(--bg); color: var(--text); 
+            font-family: 'Segoe UI', sans-serif; height: 100%; overflow-x: hidden;
+        }
+
         .hidden { display: none !important; }
         
-        #app { display: flex; flex-direction: column; height: 100dvh; }
-        .content-area { flex: 1; overflow-y: auto; }
+        /* STRUCTURE APP */
+        #app { display: flex; flex-direction: column; min-height: 100vh; }
+        .content-area { flex: 1; padding-bottom: 80px; }
         
-        header { padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        header { padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; background: #000; position: sticky; top: 0; z-index: 100; }
         .logo-text { color: var(--pink); font-weight: 800; font-size: 1.5rem; font-style: italic; }
 
-        .item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1a1a1a; cursor: pointer; }
-        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #333; margin-right: 15px; object-fit: cover; border: 1.5px solid var(--pink); }
-        .item-info { flex: 1; }
-        .item-name { font-weight: bold; font-size: 15px; }
-        .item-last { font-size: 12px; color: #888; }
-
-        #chatWindow { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: none; flex-direction: column; }
+        /* CHAT WINDOW */
+        #chatWindow { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--bg); z-index: 2000; display: none; flex-direction: column; 
+        }
+        
+        .chat-header { background: #000; padding: 10px; display: flex; align-items: center; border-bottom: 1px solid #222; }
+        
         .messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px; }
         
         .bubble { padding: 10px 14px; border-radius: 18px; max-width: 75%; font-size: 14px; word-wrap: break-word; }
         .bubble.sent { background: var(--pink); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         .bubble.received { background: #262626; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; }
 
-        .input-bar { padding: 10px; background: #121212; border-top: 1px solid #222; display: flex; gap: 10px; align-items: center; }
-        .m-input { flex: 1; background: #222; border: none; color: white; padding: 12px 15px; border-radius: 25px; outline: none; font-size: 15px; }
+        /* BARRE DE SAISIE CORRIGÉE */
+        .input-bar { 
+            background: #121212; border-top: 1px solid #222; 
+            padding: 10px 15px; display: flex; gap: 12px; align-items: center;
+            position: relative; /* Changé de sticky à relative pour mieux suivre le clavier */
+        }
+        
+        .m-input { 
+            flex: 1; background: #222; border: none; color: white; 
+            padding: 12px 15px; border-radius: 25px; outline: none; font-size: 16px; 
+        }
 
-        .nav { height: 65px; background: #000; border-top: 1px solid #222; display: flex; align-items: center; }
+        .file-label { font-size: 24px; color: var(--pink); cursor: pointer; }
+
+        /* NAVIGATION */
+        .nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; border-top: 1px solid #222; display: flex; align-items: center; }
         .nav-item { flex: 1; text-align: center; font-size: 10px; color: #555; cursor: pointer; }
         .nav-item.active { color: var(--pink); font-weight: bold; }
 
+        /* AUTH & ITEMS */
         .auth-screen { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; overflow-y: auto; }
         .input-box { width: 100%; max-width: 350px; margin-bottom: 15px; }
-        .input-box label { display: block; font-size: 12px; color: var(--pink); margin-bottom: 5px; margin-left: 5px; }
         .input-box input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #111; color: white; box-sizing: border-box; }
-        .btn { width: 100%; max-width: 350px; padding: 14px; background: var(--pink); border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; }
+        .btn { width: 100%; max-width: 350px; padding: 14px; background: var(--pink); border: none; border-radius: 12px; color: white; font-weight: bold; }
+        .item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #1a1a1a; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; border: 1.5px solid var(--pink); margin-right: 12px; }
     </style>
 </head>
 <body>
 
 <div id="authScreen" class="auth-screen">
-    <h1 style="color:var(--pink); font-style: italic; font-size: 2.5rem;">Mi-Kura</h1>
+    <h1 style="color:var(--pink); font-style: italic;">Mi-Kura</h1>
     <div class="input-box"><input type="email" id="email" placeholder="Email"></div>
     <div class="input-box"><input type="password" id="pass" placeholder="Mot de passe"></div>
-    
     <div id="registrationFields">
-        <div class="input-box">
-            <label>Code de Validation</label>
-            <input type="text" id="regCode" placeholder="Entrez le code secret">
-        </div>
+        <div class="input-box"><input type="text" id="regCode" placeholder="Code de Validation"></div>
         <div class="input-box"><input type="text" id="regPseudo" placeholder="Ton Pseudo"></div>
         <button class="btn" onclick="handleAuth('signup')">S'inscrire</button>
-        <p onclick="toggleAuth(false)" style="color:#888; font-size:12px; margin-top:15px; text-align:center; cursor:pointer;">Déjà un compte ? Connexion</p>
+        <p onclick="toggleAuth(false)" style="color:#888; font-size:12px; margin-top:15px; text-align:center;">Déjà un compte ? Connexion</p>
     </div>
-
     <div id="loginFields" class="hidden">
         <button class="btn" onclick="handleAuth('login')" style="background:#333;">Se connecter</button>
-        <p onclick="toggleAuth(true)" style="color:var(--pink); font-size:12px; margin-top:15px; text-align:center; cursor:pointer;">Créer un compte</p>
+        <p onclick="toggleAuth(true)" style="color:var(--pink); font-size:12px; margin-top:15px; text-align:center;">Créer un compte</p>
     </div>
 </div>
 
 <div id="app" class="hidden">
-    <header>
-        <div class="logo-text">Mi-Kura</div>
-        <div id="welcomeMsg"></div>
-    </header>
-
+    <header><div class="logo-text">Mi-Kura</div><div id="welcomeMsg" style="color:var(--pink); font-size:12px;"></div></header>
     <div class="content-area">
         <div id="tabMsg"><div id="convList"></div></div>
         <div id="tabContacts" class="hidden"><div id="contactsList"></div></div>
-        <div id="tabAccount" class="hidden" style="text-align:center; padding-top:30px;">
-            <img id="myPfp" src="" class="avatar" style="width:100px; height:100px; margin-bottom:10px;">
+        <div id="tabAccount" class="hidden" style="text-align:center; padding-top:20px;">
+            <img id="myPfp" src="" class="avatar" style="width:80px; height:80px;">
             <h2 id="dispPseudo"></h2>
-            <button class="btn" onclick="logout()" style="background:#cc0000; width:150px;">Déconnexion</button>
+            <button class="btn" onclick="logout()" style="background:#cc0000; width:150px;">Quitter</button>
         </div>
     </div>
-
     <nav class="nav">
-        <div class="nav-item active" id="nMsg" onclick="switchTab('msg')">💬<br>Discussions</div>
-        <div class="nav-item" id="nCont" onclick="switchTab('contacts')">👥<br>Contacts</div>
+        <div class="nav-item active" id="nMsg" onclick="switchTab('msg')">💬<br>Chat</div>
+        <div class="nav-item" id="nCont" onclick="switchTab('contacts')">👥<br>Amis</div>
         <div class="nav-item" id="nAcc" onclick="switchTab('account')">👤<br>Moi</div>
     </nav>
 </div>
 
 <div id="chatWindow">
-    <div class="chat-header" style="background:#000; padding:10px; display:flex; align-items:center;">
-        <span onclick="closeChat()" style="color:var(--pink); font-size:30px; padding:0 15px; cursor:pointer;">‹</span>
+    <div class="chat-header">
+        <span onclick="closeChat()" style="color:var(--pink); font-size:35px; padding:0 15px;">‹</span>
         <img id="chatAvatar" class="avatar" style="width:35px; height:35px; margin:0">
         <b id="chatName" style="margin-left:10px;"></b>
     </div>
     <div class="messages" id="msgArea"></div>
+    
     <div class="input-bar">
-        <input type="text" id="mInput" class="m-input" placeholder="Écris ici..." autocomplete="off">
+        <label for="fileInput" class="file-label">📷</label>
+        <input type="file" id="fileInput" class="hidden" accept="image/*">
+        <input type="text" id="mInput" class="m-input" placeholder="Message..." autocomplete="off">
         <button onclick="send()" style="background:none; border:none; color:var(--pink); font-weight:bold; font-size:16px;">Envoyer</button>
     </div>
 </div>
@@ -120,9 +134,15 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let myEmail = "";
-    let chatTarget = "";
-    let allUsers = {};
+    let myEmail = ""; let chatTarget = ""; let allUsers = {};
+
+    // GESTION CLAVIER : On scrolle automatiquement quand on clique sur l'input
+    document.getElementById('mInput').addEventListener('focus', () => {
+        setTimeout(() => {
+            window.scrollTo(0, 0);
+            scrollBottom();
+        }, 300);
+    });
 
     window.toggleAuth = (isSignup) => {
         document.getElementById('registrationFields').classList.toggle('hidden', !isSignup);
@@ -134,18 +154,13 @@
         const p = document.getElementById('pass').value;
         if (mode === 'signup') {
             const pseudo = document.getElementById('regPseudo').value;
-            const code = document.getElementById('regCode').value;
-            
-            // CONFIGURATION DU CODE DE VALIDATION
-            if(code !== "Neviah2004") return alert("Code de Validation incorrect !");
-            
-            if(!pseudo) return alert("Choisis un pseudo !");
+            if(document.getElementById('regCode').value !== "Neviah2004") return alert("Code Incorrect");
             try {
                 await createUserWithEmailAndPassword(auth, e, p);
                 await setDoc(doc(db, "participants", e), { email: e, pseudo: pseudo, photo: `https://ui-avatars.com/api/?name=${pseudo}&background=ff69b4&color=fff` });
             } catch(err) { alert(err.message); }
         } else {
-            try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Identifiants incorrects"); }
+            try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Erreur connexion"); }
         }
     };
 
@@ -156,8 +171,7 @@
             document.getElementById('app').classList.remove('hidden');
             const snap = await getDocs(collection(db, "participants"));
             snap.forEach(d => allUsers[d.id] = d.data());
-            loadRecentConvs();
-            loadContacts();
+            loadRecentConvs(); loadContacts();
             document.getElementById('dispPseudo').innerText = allUsers[myEmail]?.pseudo || "";
             document.getElementById('myPfp').src = allUsers[myEmail]?.photo || "";
         } else {
@@ -182,8 +196,7 @@
             sorted.forEach(([email, m]) => {
                 const u = allUsers[email] || {pseudo: email, photo: ""};
                 list.innerHTML += `<div class="item" onclick="openChat('${email}', '${u.pseudo}', '${u.photo}')">
-                    <img src="${u.photo}" class="avatar">
-                    <div class="item-info"><div class="item-name">${u.pseudo}</div><div class="item-last">${m.texte}</div></div>
+                    <img src="${u.photo}" class="avatar"><div class="item-info"><b>${u.pseudo}</b><div style="font-size:12px;color:#888">${m.texte || "📷 Photo"}</div></div>
                 </div>`;
             });
         });
@@ -193,12 +206,10 @@
         onSnapshot(collection(db, "participants"), (snap) => {
             const list = document.getElementById('contactsList');
             list.innerHTML = "";
-            snap.forEach(d => {
-                if(d.id !== myEmail) {
+            snap.forEach(d => { if(d.id !== myEmail) {
                     const u = d.data();
                     list.innerHTML += `<div class="item" onclick="openChat('${u.email}', '${u.pseudo}', '${u.photo}')">
-                        <img src="${u.photo}" class="avatar"><div class="item-name">${u.pseudo}</div>
-                    </div>`;
+                        <img src="${u.photo}" class="avatar"><b>${u.pseudo}</b></div>`;
                 }
             });
         });
@@ -214,7 +225,19 @@
 
     window.send = async () => {
         const input = document.getElementById('mInput');
-        if (input.value.trim()) {
+        const fInput = document.getElementById('fileInput');
+        
+        if (fInput.files[0]) {
+            const reader = new FileReader();
+            reader.readAsDataURL(fInput.files[0]);
+            reader.onload = async () => {
+                await addDoc(collection(db, "messages_prives"), {
+                    de: myEmail, pour: chatTarget, texte: input.value,
+                    file: reader.result, date: serverTimestamp()
+                });
+                fInput.value = ""; input.value = "";
+            };
+        } else if (input.value.trim()) {
             await addDoc(collection(db, "messages_prives"), { de: myEmail, pour: chatTarget, texte: input.value, date: serverTimestamp() });
             input.value = "";
         }
@@ -230,11 +253,18 @@
             msgs.forEach(m => {
                 if((m.de === myEmail && m.pour === chatTarget) || (m.de === chatTarget && m.pour === myEmail)) {
                     const side = (m.de === myEmail) ? 'sent' : 'received';
-                    area.innerHTML += `<div class="bubble ${side}">${m.texte}</div>`;
+                    let content = `<div>${m.texte}</div>`;
+                    if(m.file) content += `<img src="${m.file}" class="msg-img">`;
+                    area.innerHTML += `<div class="bubble ${side}">${content}</div>`;
                 }
             });
-            area.scrollTop = area.scrollHeight;
+            scrollBottom();
         });
+    }
+
+    function scrollBottom() {
+        const area = document.getElementById('msgArea');
+        area.scrollTop = area.scrollHeight;
     }
 
     window.switchTab = (t) => {
@@ -242,12 +272,11 @@
         document.getElementById('tabContacts').classList.toggle('hidden', t !== 'contacts');
         document.getElementById('tabAccount').classList.toggle('hidden', t !== 'account');
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        document.getElementById('n' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('active');
+        document.getElementById('n' + (t==='msg'?'Msg':t==='contacts'?'Cont':'Acc')).classList.add('active');
     };
 
     window.closeChat = () => { chatTarget = ""; document.getElementById('chatWindow').style.display = 'none'; };
     window.logout = () => signOut(auth);
 </script>
 </body>
-    </html>
-    
+</html>
